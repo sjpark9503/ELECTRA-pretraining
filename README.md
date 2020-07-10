@@ -49,6 +49,6 @@ wandb setup : https://docs.wandb.com/library/integrations/huggingface
             [--past_index PAST_INDEX]
 
 ### Example
-'''
+```
 CUDA_VISIBLE_DEVICES=0 python run_language_modeling.py --model_type='bert' --config_name='./config/bert-small' --tokenizer_name='bert-base-uncased' --train_data_file='data/test/wiki_train' --eval_data_file='data/test/wiki_test' --line_by_line --mlm --output_dir='pretrained_model' --do_train --do_eval --evaluate_during_training
-'''
+```
