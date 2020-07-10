@@ -2,7 +2,7 @@
 ### Requirements
 - PyTorch >= 1.3.1
 - transformers == 3.0.2
-- wandb == 0.9.2
+- wandb == 0.9.2 \n
   wandb setup : https://docs.wandb.com/library/integrations/huggingface
 
 ### Options
