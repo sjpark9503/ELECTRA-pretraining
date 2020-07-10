@@ -1,4 +1,4 @@
-# ELECTRA-pretraining
+# BERT-pretraining
 ### Requirements
 - PyTorch >= 1.3.1
 - transformers == 3.0.2
