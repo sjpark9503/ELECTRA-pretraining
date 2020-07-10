@@ -3,8 +3,7 @@
 - PyTorch >= 1.3.1
 - transformers == 3.0.2
 - wandb == 0.9.2
-
-wandb setup : https://docs.wandb.com/library/integrations/huggingface
+  wandb setup : https://docs.wandb.com/library/integrations/huggingface
 
 ### Options
     run_language_modeling.py
@@ -47,6 +46,10 @@ wandb setup : https://docs.wandb.com/library/integrations/huggingface
             [--dataloader_drop_last]
             [--eval_steps EVAL_STEPS]
             [--past_index PAST_INDEX]
+
+### Usage
+- Change model hyperparameters : add or modify ./config/[CONFIG_NAME]/config.json
+- Data format : 1 sentence/line (if --line_by_line)
 
 ### Example
 ```
