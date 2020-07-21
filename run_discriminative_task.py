@@ -29,9 +29,9 @@ from typing import Optional
 from transformers import (
     CONFIG_MAPPING,
     MODEL_WITH_LM_HEAD_MAPPING,
-    AutoConfig,
-    AutoModelForMaskedLM,
-    AutoTokenizer,
+    ElectraConfig,
+    ElectraTokenizer,
+    ElectraForPreTraining,
     DataCollatorForLanguageModeling,
     # DataCollatorForPermutationLanguageModeling,
     HfArgumentParser,
@@ -186,18 +186,18 @@ def main():
 
     logging.basicConfig(level=logging.WARNING)
     if model_args.config_name:
-        config = AutoConfig.from_pretrained(model_args.config_name)
+        config = ElectraConfig.from_pretrained(model_args.config_name)
     elif model_args.model_name_or_path:
-        config = AutoConfig.from_pretrained(model_args.model_name_or_path)
+        config = ElectraConfig.from_pretrained(model_args.model_name_or_path)
     else:
         config = CONFIG_MAPPING[model_args.model_type]()
         logger.warning("You are instantiating a new config instance from scratch.")
 
     if model_args.tokenizer_name:
         logging.getLogger("AutoTokenizer").setLevel(logging.WARNING)
-        tokenizer = AutoTokenizer.from_pretrained(model_args.tokenizer_name, cache_dir=model_args.cache_dir)
+        tokenizer = ElectraTokenizer.from_pretrained(model_args.tokenizer_name)
     elif model_args.model_name_or_path:
-        tokenizer = AutoTokenizer.from_pretrained(model_args.model_name_or_path, cache_dir=model_args.cache_dir)
+        tokenizer = ElectraTokenizer.from_pretrained(model_args.model_name_or_path)
     else:
         raise ValueError(
             "You are instantiating a new tokenizer from scratch. This is not supported, but you can do it from another script, save it,"
@@ -205,7 +205,7 @@ def main():
         )
 
     if model_args.model_name_or_path:
-        model = AutoModelForMaskedLM.from_pretrained(
+        model = ElectraForPreTraining.from_pretrained(
             model_args.model_name_or_path,
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
             config=config,
@@ -213,7 +213,7 @@ def main():
         )
     else:
         logger.info("Training new model from scratch")
-        model = AutoModelForMaskedLM.from_config(config)
+        model = ElectraForPreTraining.from_config(config)
 
     logger.info(model.config)
     model.resize_token_embeddings(len(tokenizer))
