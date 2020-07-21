@@ -1,4 +1,5 @@
 # BERT-pretraining
+Scripts for pretraining LM based on [HuggingFace transformers](https://huggingface.co/transformers/)
 ### Requirements
 - PyTorch >= 1.3.1
 - transformers == 3.0.2
