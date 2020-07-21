@@ -32,6 +32,7 @@ from transformers import (
     AutoConfig,
     AutoModelForMaskedLM,
     AutoTokenizer,
+    BERTTokenizerFast,
     DataCollatorForLanguageModeling,
     # DataCollatorForPermutationLanguageModeling,
     HfArgumentParser,
@@ -194,7 +195,7 @@ def main():
 
     if model_args.tokenizer_name:
         logging.getLogger("AutoTokenizer").setLevel(logging.WARNING)
-        tokenizer = AutoTokenizer.from_pretrained(model_args.tokenizer_name, cache_dir=model_args.cache_dir)
+        tokenizer = BERTTokenizerFast.from_pretrained(model_args.tokenizer_name, cache_dir=model_args.cache_dir)
     elif model_args.model_name_or_path:
         tokenizer = AutoTokenizer.from_pretrained(model_args.model_name_or_path, cache_dir=model_args.cache_dir)
     else:
