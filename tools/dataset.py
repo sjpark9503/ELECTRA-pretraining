@@ -41,18 +41,19 @@ class TextDataset(Dataset):
                 with open(cached_features_file, "rb") as handle:
                     self.examples = pickle.load(handle)
                 logger.info(
-                    f"Loading features from cached file {cached_features_file} [took %.3f s]", time.time() - start
+                    "Loading features from cached file %s [took %.3f s]", cached_features_file, time.time() - start
                 )
 
             else:
-                logger.info(f"Creating features from dataset file at {directory}")
-
+                logger.info("Creating features from dataset file at %s", directory)
                 self.examples = []
                 with open(file_path, encoding="utf-8") as f:
-                    text = f.read()
-
+                    text = ''
+                    for line in f:
+                        text += (line.rstrip('\n')+' ')
+                logger.info("Mem Crash Check Step 1")
                 tokenized_text = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(text))
-
+                logger.info("Mem Crash Check Step 2")
                 for i in range(0, len(tokenized_text) - block_size + 1, block_size):  # Truncate in block of block_size
                     self.examples.append(
                         tokenizer.build_inputs_with_special_tokens(tokenized_text[i : i + block_size])
@@ -89,9 +90,9 @@ class LineByLineTextDataset(Dataset):
         logger.info("Creating features from dataset file at %s", file_path)
 
         with open(file_path, encoding="utf-8") as f:
-            lines = [line.rstrip('\n') for line in tqdm(f,total=119371337) if (len(line) > 0 and not line.isspace())]
+            lines = [line.rstrip('\n') for line in f if (len(line) > 0 and not line.isspace())]
 
-        print(len(lines))
+        # print(len(lines))
         batch_encoding = tokenizer(lines, add_special_tokens=True, truncation=True, max_length=block_size)
         self.examples = batch_encoding["input_ids"]
 
