@@ -32,7 +32,7 @@ from transformers import (
     AutoConfig,
     AutoModelForMaskedLM,
     AutoTokenizer,
-    BERTTokenizerFast,
+    BertTokenizerFast,
     DataCollatorForLanguageModeling,
     # DataCollatorForPermutationLanguageModeling,
     HfArgumentParser,
