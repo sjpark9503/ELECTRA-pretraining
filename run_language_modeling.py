@@ -35,13 +35,12 @@ from transformers import (
     DataCollatorForLanguageModeling,
     # DataCollatorForPermutationLanguageModeling,
     HfArgumentParser,
-    LineByLineTextDataset,
     PreTrainedTokenizer,
-    TextDataset,
     Trainer,
     TrainingArguments,
     set_seed,
 )
+from tools.dataset import TextDataset, LineByLineTextDataset
 
 
 logger = logging.getLogger(__name__)
