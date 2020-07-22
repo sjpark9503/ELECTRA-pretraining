@@ -39,8 +39,7 @@ class TextDataset(Dataset):
 
             if os.path.exists(cached_features_file) and not overwrite_cache:
                 start = time.time()
-                with open(cached_features_file, "rb") as handle:
-                    self.examples = pickle.load(handle)
+                self.examples = torch.load(cached_features_file)
                 logger.info(
                     "Loading features from cached file %s [took %.3f s]", cached_features_file, time.time() - start
                 )
