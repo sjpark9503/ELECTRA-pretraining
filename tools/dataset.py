@@ -47,7 +47,7 @@ class TextDataset(Dataset):
 
             else:
                 logger.info("Creating features from dataset file at %s", directory)
-                self.examples = torch.tensor()
+                self.examples = torch.tensor([])
                 with open(file_path, encoding="utf-8") as f:
                     tokenized_text = list()
                     for line in tqdm(f,total=119371337,file=sys.__stdout__):
