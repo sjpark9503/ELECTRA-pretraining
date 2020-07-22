@@ -47,14 +47,14 @@ class TextDataset(Dataset):
 
             else:
                 logger.info("Creating features from dataset file at %s", directory)
-                self.examples = torch.tensor([])
+                self.examples = torch.tensor([], dtype=torch.long)
                 with open(file_path, encoding="utf-8") as f:
                     tokenized_text = list()
                     for line in tqdm(f,total=119371337,file=sys.__stdout__):
                         text = line.rstrip('\n')
                         tokenized_text += tokenizer.convert_tokens_to_ids(tokenizer.tokenize(text))
                         if len(tokenized_text)>block_size:
-                            self.examples = torch.cat([self.examples,torch.tensor(tokenizer.build_inputs_with_special_tokens(tokenized_text[:block_size]))],dim=0)
+                            self.examples = torch.cat([self.examples,torch.tensor(tokenizer.build_inputs_with_special_tokens(tokenized_text[:block_size]), dtype=torch.long)],dim=0)
                             tokenized_text = tokenized_text[block_size:]
 
                 # Note that we are losing the last truncated example here for the sake of simplicity (no padding)
