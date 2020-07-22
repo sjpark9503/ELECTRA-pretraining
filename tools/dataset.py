@@ -3,6 +3,7 @@ import os
 import pickle
 import time
 from tqdm import tqdm
+import sys
 
 import torch
 from filelock import FileLock
@@ -23,7 +24,7 @@ class TextDataset(Dataset):
         self, tokenizer: PreTrainedTokenizer, file_path: str, block_size: int, overwrite_cache=False,
     ):
         assert os.path.isfile(file_path)
-
+        self.full_block_size = block_size
         block_size = block_size - tokenizer.num_special_tokens_to_add(pair=False)
 
         directory, filename = os.path.split(file_path)
@@ -46,25 +47,23 @@ class TextDataset(Dataset):
 
             else:
                 logger.info("Creating features from dataset file at %s", directory)
-                self.examples = []
+                self.examples = torch.tensor()
                 with open(file_path, encoding="utf-8") as f:
-                    text = ''
-                    for line in f:
-                        text += (line.rstrip('\n')+' ')
-                logger.info("Mem Crash Check Step 1")
-                tokenized_text = tokenizer.convert_tokens_to_ids(tokenizer.tokenize(text))
-                logger.info("Mem Crash Check Step 2")
-                for i in range(0, len(tokenized_text) - block_size + 1, block_size):  # Truncate in block of block_size
-                    self.examples.append(
-                        tokenizer.build_inputs_with_special_tokens(tokenized_text[i : i + block_size])
-                    )
+                    tokenized_text = list()
+                    for line in tqdm(f,total=119371337,file=sys.__stdout__):
+                        text = line.rstrip('\n')
+                        tokenized_text += tokenizer.convert_tokens_to_ids(tokenizer.tokenize(text))
+                        if len(tokenized_text>block_size):
+                            self.examples = torch.cat([self.examples,torch.tensor(tokenizer.build_inputs_with_special_tokens(tokenized_text[:block_size]))],dim=0)
+                            tokenized_text = tokenized_text[block_size:]
+
                 # Note that we are losing the last truncated example here for the sake of simplicity (no padding)
                 # If your dataset is small, first you should loook for a bigger one :-) and second you
                 # can change this behavior by adding (model specific) padding.
 
                 start = time.time()
                 with open(cached_features_file, "wb") as handle:
-                    pickle.dump(self.examples, handle, protocol=pickle.HIGHEST_PROTOCOL)
+                    torch.save(self.examples, handle)
                 logger.info(
                     "Saving features into cached file %s [took %.3f s]", cached_features_file, time.time() - start
                 )
