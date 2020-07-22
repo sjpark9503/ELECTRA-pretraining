@@ -53,7 +53,7 @@ class TextDataset(Dataset):
                     for line in tqdm(f,total=119371337,file=sys.__stdout__):
                         text = line.rstrip('\n')
                         tokenized_text += tokenizer.convert_tokens_to_ids(tokenizer.tokenize(text))
-                        if len(tokenized_text>block_size):
+                        if len(tokenized_text)>block_size:
                             self.examples = torch.cat([self.examples,torch.tensor(tokenizer.build_inputs_with_special_tokens(tokenized_text[:block_size]))],dim=0)
                             tokenized_text = tokenized_text[block_size:]
 
