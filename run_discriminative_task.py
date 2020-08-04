@@ -30,19 +30,19 @@ from transformers import (
     CONFIG_MAPPING,
     MODEL_WITH_LM_HEAD_MAPPING,
     ElectraConfig,
-    ElectraTokenizer,
+    BertTokenizerFast,
     ElectraForPreTraining,
-    DataCollatorForLanguageModeling,
     # DataCollatorForPermutationLanguageModeling,
     HfArgumentParser,
-    LineByLineTextDataset,
     PreTrainedTokenizer,
-    TextDataset,
     Trainer,
     TrainingArguments,
     set_seed,
 )
-
+from tools.data_collator import DataCollatorForLanguageModeling
+from tools.modeling_electra import ElectraForPreTrainingWithGenerator
+from tools.trainer import ElectraTrainer
+from tools.dataset import TextDataset,LineByLineTextDataset
 
 logger = logging.getLogger(__name__)
 
@@ -195,9 +195,9 @@ def main():
 
     if model_args.tokenizer_name:
         logging.getLogger("AutoTokenizer").setLevel(logging.WARNING)
-        tokenizer = ElectraTokenizer.from_pretrained(model_args.tokenizer_name)
+        tokenizer = BertTokenizerFast.from_pretrained(model_args.tokenizer_name)
     elif model_args.model_name_or_path:
-        tokenizer = ElectraTokenizer.from_pretrained(model_args.model_name_or_path)
+        tokenizer = BertTokenizerFast.from_pretrained(model_args.model_name_or_path)
     else:
         raise ValueError(
             "You are instantiating a new tokenizer from scratch. This is not supported, but you can do it from another script, save it,"
@@ -205,7 +205,7 @@ def main():
         )
 
     if model_args.model_name_or_path:
-        model = ElectraForPreTraining.from_pretrained(
+        model = ElectraForPreTrainingWithGenerator.from_pretrained(
             model_args.model_name_or_path,
             from_tf=bool(".ckpt" in model_args.model_name_or_path),
             config=config,
@@ -213,10 +213,10 @@ def main():
         )
     else:
         logger.info("Training new model from scratch")
-        model = ElectraForPreTraining.from_config(config)
+        model = ElectraForPreTrainingWithGenerator(config)
 
     logger.info(model.config)
-    model.resize_token_embeddings(len(tokenizer))
+    # model.resize_token_embeddings(len(tokenizer))
 
     if config.model_type in ["bert", "roberta", "distilbert", "camembert"] and not data_args.mlm:
         raise ValueError(
@@ -244,7 +244,7 @@ def main():
         )
 
     # Initialize our Trainer
-    trainer = Trainer(
+    trainer = ElectraTrainer(
         model=model,
         args=training_args,
         data_collator=data_collator,
