@@ -239,8 +239,11 @@ def main():
         #     tokenizer=tokenizer, plm_probability=data_args.plm_probability, max_span_length=data_args.max_span_length,
         # )
     # else:
+    """
+    mode = ['mlm', 'wordnet', 'random']
+    """
     data_collator = DataCollatorForLanguageModeling(
-        tokenizer=tokenizer, mlm=data_args.mlm, mlm_probability=data_args.mlm_probability
+        tokenizer=tokenizer, mode=data_args.mode, mlm_probability=data_args.mlm_probability
         )
 
     # Initialize our Trainer
