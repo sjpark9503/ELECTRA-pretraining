@@ -687,6 +687,13 @@ class ElectraForPreTrainingWithGenerator(ElectraPreTrainedModel):
         config.hidden_size, config.intermediate_size, config.num_attention_heads = int(config.hidden_size*self.generator_scaling), int(config.intermediate_size*self.generator_scaling), int(config.num_attention_heads*self.generator_scaling)
         self.generator = ElectraForMaskedLM(config)
 
+        tie_weights(generator.generator_lm_head, generator.electra.embeddings.word_embeddings)
+        tie_weights(discriminator.electra.embeddings.word_embeddings,
+                    generator.electra.embeddings.word_embeddings)
+        tie_weights(discriminator.electra.embeddings.position_embeddings,
+                    generator.electra.embeddings.position_embeddings)
+        tie_weights(discriminator.electra.embeddings.token_type_embeddings,
+                    generator.electra.embeddings.token_type_embeddings)
 
     def forward(
         self,
@@ -1013,3 +1020,18 @@ class ElectraForMultipleChoice(ElectraPreTrainedModel):
             hidden_states=discriminator_hidden_states.hidden_states,
             attentions=discriminator_hidden_states.attentions,
         )
+
+def tie_weights(output_embeddings, input_embeddings):
+    """ Tie module weights
+    """
+    output_embeddings.weight = nn.Parameter(input_embeddings.weight.clone())
+
+    if hasattr(output_embeddings, "bias") and output_embeddings.bias is not None:
+        output_embeddings.bias.data = torch.nn.functional.pad(
+            output_embeddings.bias.data,
+            (0, output_embeddings.weight.shape[0] - output_embeddings.bias.shape[0]),
+            "constant",
+            0,
+        )
+    if hasattr(output_embeddings, "out_features") and hasattr(input_embeddings, "num_embeddings"):
+        output_embeddings.out_features = input_embeddings.num_embeddings
